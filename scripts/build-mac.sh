@@ -18,6 +18,10 @@ mkdir -p "$dialog_output/Contents/MacOS" "$dialog_output/Contents/Resources"
 cp "$dialog_root/native/.build/release/Dialog" "$dialog_output/Contents/MacOS/Dialog"
 cp "$dialog_root/native/.build/release/DialogSpeech" "$dialog_output/Contents/MacOS/DialogSpeech"
 cp "$dialog_root/native/Info.plist" "$dialog_output/Contents/Info.plist"
+# Distribution builds drop debug maps, which list this machine's build paths.
+if [[ -n "${DIALOG_DISTRIBUTION:-}" ]]; then
+  strip -S -x "$dialog_output/Contents/MacOS/Dialog" "$dialog_output/Contents/MacOS/DialogSpeech"
+fi
 ditto "$dialog_root/third-party" "$dialog_output/Contents/Resources/ThirdParty"
 print -r -- "$dialog_root" > "$dialog_output/Contents/Resources/project-root.txt"
 if [[ ! -f "$dialog_output/Contents/Resources/Dialog.icns" ]]; then

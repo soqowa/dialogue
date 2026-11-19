@@ -112,7 +112,10 @@ def check_runtime():
     ]
     env = {**os.environ, "PYTHONNOUSERSITE": "1", "PYTHONDONTWRITEBYTECODE": "1"}
     env.pop("PYTHONPATH", None); env.pop("PYTHONHOME", None)
-    run([python, "-I", "-c", "; ".join(checks)], env=env)
+    run([python, "-I", "-B", "-c", "; ".join(checks)], env=env)
+    # -I ignores PYTHONDONTWRITEBYTECODE; never ship caches that embed build paths.
+    for cache in RUNTIME.rglob("__pycache__"):
+        shutil.rmtree(cache, ignore_errors=True)
     run([RUNTIME / "node/bin/node", "--version"])
     run([RUNTIME / "codex/bin/codex", "--version"])
     for item in APP.rglob("*"):
@@ -142,7 +145,7 @@ def main():
     if os.uname().machine != "arm64":
         raise RuntimeError("This package targets Apple Silicon")
     print("Building native application", flush=True)
-    run(["zsh", ROOT / "scripts/build-mac.sh"])
+    run(["zsh", ROOT / "scripts/build-mac.sh"], env={**os.environ, "DIALOG_DISTRIBUTION": "1"})
     specs = [LOCK["node"], LOCK["codex"]] + LOCK["mlx"]
     with ThreadPoolExecutor(max_workers=4) as pool:
         archives = list(pool.map(download, specs))

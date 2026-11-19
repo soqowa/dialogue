@@ -17,7 +17,13 @@ final class BackendProcess {
            let text = try? String(contentsOf: file, encoding: .utf8) {
             return URL(fileURLWithPath: text.trimmingCharacters(in: .whitespacesAndNewlines))
         }
+        #if DEBUG
+        // Running from Xcode or `swift run`: the sources sit inside the project.
         return URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+        #else
+        // Release binaries never embed the build machine's source path.
+        return URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
+        #endif
     }
     var dataRoot: URL {
         if let override = ProcessInfo.processInfo.environment["DIALOG_DATA_DIR"] { return URL(fileURLWithPath: override) }
