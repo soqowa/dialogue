@@ -2,6 +2,7 @@
   "name": "dialog-codex-companion",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "Live call companion powered by your Codex subscription and local speech recognition",
   "scripts": {

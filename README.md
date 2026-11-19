@@ -69,3 +69,7 @@ swift test --package-path native
 ## Сторонние компоненты
 
 Используемые проекты и их лицензии перечислены в [`third-party/README.md`](third-party/README.md).
+
+## Лицензия
+
+[MIT](LICENSE).
