@@ -1,0 +1,5 @@
+mlx-whisper==0.4.3
+onnxruntime==1.23.2
+torch==2.10.0
+torchaudio==2.10.0
+gigaam @ git+https://github.com/salute-developers/GigaAM.git@7447938d791c4f3e643386ee22c33777004293a5
