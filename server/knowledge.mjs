@@ -58,7 +58,13 @@ export class Knowledge {
     this.chunks.push(...chunkText(text, name, document.id));
     if (persist) await this.save();
   }
-  async remove(id) { this.documents = this.documents.filter(d => d.id !== id); this.chunks = this.chunks.filter(c => c.documentId !== id); await this.save(); }
+  async remove(id) { await this.removeMany([id]); }
+  async removeMany(ids) {
+    const removed = new Set(ids);
+    this.documents = this.documents.filter(d => !removed.has(d.id));
+    this.chunks = this.chunks.filter(c => !removed.has(c.documentId));
+    await this.save();
+  }
   async save() {
     const data = JSON.stringify(this.documents);
     this.saving = this.saving.catch(() => {}).then(async () => {

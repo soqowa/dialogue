@@ -21,7 +21,7 @@ struct ProjectMenu: View {
     var body: some View {
         Button { expanded.toggle() } label: {
             HStack(spacing: 8) {
-                Image(systemName: "folder").foregroundStyle(DialogPalette.sage)
+                Image(systemName: "folder.fill").foregroundStyle(DialogPalette.icon)
                 Text(app.currentProject?.name ?? "Общее").lineLimit(1).truncationMode(.middle)
                 Spacer(minLength: 4)
                 if app.projectBusy { ProgressView().controlSize(.mini) }
@@ -42,27 +42,27 @@ struct ProjectMenu: View {
                     ForEach(app.projects) { project in
                         Button { expanded = false; Task { await app.switchProject(project.id) } } label: {
                             HStack(spacing: 10) {
-                                Image(systemName: "folder").foregroundStyle(DialogPalette.sage)
+                                Image(systemName: "folder").foregroundStyle(DialogPalette.muted)
                                 Text(project.name).lineLimit(1).truncationMode(.middle)
                                 Spacer(minLength: 8)
-                                if project.id == app.currentProject?.id { Image(systemName: "checkmark").font(.system(size: 11, weight: .semibold)).foregroundStyle(DialogPalette.sage) }
+                                if project.id == app.currentProject?.id { Image(systemName: "checkmark").font(.system(size: 11, weight: .semibold)).foregroundStyle(DialogPalette.ink) }
                             }.font(.system(size: 12)).frame(maxWidth: .infinity, minHeight: 40, alignment: .leading).contentShape(Rectangle())
                         }.buttonStyle(DialogButtonStyle(.row, selected: project.id == app.currentProject?.id))
                             .accessibilityIdentifier("project.option.\(project.id)").help(project.name)
                     }
                 }
             }.frame(height: min(CGFloat(app.projects.count) * 47, 235))
-            Divider().overlay(DialogPalette.line).padding(.vertical, 3)
+            GlassDivider().padding(.vertical, 3)
             dropdownAction("Новый проект", symbol: "plus", rename: false)
             if let current = app.currentProject, !current.isGeneral { dropdownAction("Переименовать", symbol: "pencil", rename: true) }
-        }.padding(8).frame(width: 270).foregroundStyle(DialogPalette.ink).background(DialogPalette.canvas)
+        }.padding(8).frame(width: 270).foregroundStyle(DialogPalette.ink)
     }
     private func dropdownAction(_ title: String, symbol: String, rename: Bool) -> some View {
         Button {
             expanded = false
             Task { @MainActor in await Task.yield(); app.beginProjectEditor(rename: rename) }
         } label: {
-            Label(title, systemImage: symbol).font(.system(size: 12)).frame(maxWidth: .infinity, minHeight: 40, alignment: .leading).foregroundStyle(DialogPalette.sage).contentShape(Rectangle())
+            Label(title, systemImage: symbol).font(.system(size: 12)).frame(maxWidth: .infinity, minHeight: 40, alignment: .leading).foregroundStyle(DialogPalette.ink).contentShape(Rectangle())
         }.buttonStyle(DialogButtonStyle(.row)).accessibilityIdentifier(rename ? "project.rename" : "project.create")
     }
 }
@@ -74,31 +74,30 @@ struct ProjectEditorView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 12) {
-                Image(systemName: app.projectEditorRename ? "folder" : "folder.badge.plus").font(.system(size: 20, weight: .regular)).foregroundStyle(DialogPalette.sage)
-                    .frame(width: 42, height: 42).background(DialogPalette.sage.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
-                Text(app.projectEditorRename ? "Название проекта" : "Новый проект").font(.system(size: 23, weight: .medium)).tracking(-0.5)
+                Image(systemName: app.projectEditorRename ? "folder" : "folder.badge.plus").font(.system(size: 20, weight: .regular)).foregroundStyle(DialogPalette.icon)
+                    .frame(width: 44, height: 44).liquidGlass(RoundedRectangle(cornerRadius: 13, style: .continuous))
+                Text(app.projectEditorRename ? "Название проекта" : "Новый проект").font(.system(size: 23, weight: .semibold)).tracking(-0.5)
                 Spacer()
-                DialogIconButton(symbol: "xmark", label: "Закрыть окно проекта") { dismiss() }
+                DialogIconButton(symbol: "xmark", label: "Закрыть окно проекта", glass: true) { dismiss() }
             }
             VStack(alignment: .leading, spacing: 8) {
                 Text("Название проекта").font(.system(size: 12, weight: .medium))
                 TextField("Например, собеседование", text: $app.projectNameDraft).textFieldStyle(.plain).font(.system(size: 14)).focused($focused)
-                    .padding(.horizontal, 13).frame(height: 42).background(.white, in: RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(focused ? DialogPalette.sage.opacity(0.55) : DialogPalette.line).allowsHitTesting(false))
-                    .tint(DialogPalette.sage).accessibilityLabel("Название проекта").accessibilityIdentifier("project.editor.name")
+                    .padding(.horizontal, 14).frame(height: 42).background(DialogPalette.field, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(focused ? DialogPalette.accent.opacity(0.7) : DialogPalette.line).allowsHitTesting(false))
+                    .tint(DialogPalette.accent).accessibilityLabel("Название проекта").accessibilityIdentifier("project.editor.name")
                     .onSubmit { Task { await app.saveProjectEditor() } }
             }
             if !app.projectEditorRename {
                 HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: "square.on.square").font(.system(size: 14)).foregroundStyle(DialogPalette.sage).padding(.top, 2)
+                    Image(systemName: "square.on.square").font(.system(size: 14)).foregroundStyle(DialogPalette.muted).padding(.top, 2)
                     VStack(alignment: .leading, spacing: 5) {
                         Text("Материалы и манера ответа из «Общего»").font(.system(size: 12))
                         Text("История начнётся с нового разговора.").font(.system(size: 11)).foregroundStyle(DialogPalette.muted)
                     }
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(13).background(DialogPalette.sage.opacity(0.055), in: RoundedRectangle(cornerRadius: 8))
+                }.frame(maxWidth: .infinity, alignment: .leading).padding(14).background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
             if let error = app.projectEditorError { Text(error).font(.system(size: 12)).foregroundStyle(.orange) }
-            Divider().overlay(DialogPalette.line)
             HStack {
                 Spacer()
                 Button("Отмена") { dismiss() }.buttonStyle(DialogToolbarButtonStyle()).keyboardShortcut(.cancelAction)
@@ -107,7 +106,7 @@ struct ProjectEditorView: View {
                 }.buttonStyle(DialogToolbarButtonStyle(primary: true)).keyboardShortcut(.defaultAction).accessibilityIdentifier("project.editor.save")
                     .disabled(app.projectNameDraft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
-        }.padding(28).frame(width: 460).foregroundStyle(DialogPalette.ink).background(DialogPalette.canvas)
+        }.padding(28).frame(width: 460).dialogSheet()
             .disabled(app.projectSaving).interactiveDismissDisabled(app.projectSaving).onAppear { focused = true }
     }
 }

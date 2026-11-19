@@ -29,3 +29,19 @@ test('Materials survive reload, deduplicate by content, and removal updates retr
     await restored.remove(restored.list()[0].id); assert.deepEqual(restored.search('LIFO'), []);
   } finally { await rm(folder, { recursive: true, force: true }); }
 });
+
+test('A whole folder can be removed in one call', async () => {
+  const folder = await mkdtemp(path.join(os.tmpdir(), 'dialog-test-'));
+  try {
+    const store = new Knowledge(folder); await store.load();
+    await store.add('project/src/a.md', 'Очередь работает по принципу FIFO.');
+    await store.add('project/src/b.md', 'Дек поддерживает обе стороны.');
+    await store.add('notes.md', 'Стек работает по принципу LIFO.');
+    const ids = store.list().filter(d => d.name.startsWith('project/')).map(d => d.id);
+    await store.removeMany(ids);
+    const restored = new Knowledge(folder); await restored.load();
+    assert.deepEqual(restored.list().map(d => d.name), ['notes.md']);
+    assert.deepEqual(restored.search('FIFO'), []);
+    assert.equal(restored.search('LIFO')[0].name, 'notes.md');
+  } finally { await rm(folder, { recursive: true, force: true }); }
+});

@@ -66,6 +66,13 @@ app.post('/api/projects/:projectId/materials', upload.array('files'), async (req
 app.delete('/api/projects/:projectId/materials/:id', async (req, res, next) => {
   try { const { knowledge } = projects.get(req.params.projectId); await knowledge.remove(req.params.id); res.json(knowledge.list()); } catch (e) { next(e); }
 });
+app.post('/api/projects/:projectId/materials/delete', async (req, res, next) => {
+  try {
+    const ids = req.body?.ids;
+    if (!Array.isArray(ids) || !ids.length || ids.some(id => typeof id !== 'string')) throw new Error('Не выбраны материалы для удаления');
+    const { knowledge } = projects.get(req.params.projectId); await knowledge.removeMany(ids); res.json(knowledge.list());
+  } catch (e) { next(e); }
+});
 app.get('/api/projects/:projectId/sessions', (req, res, next) => { try { res.json(projects.get(req.params.projectId).sessions.list()); } catch (e) { next(e); } });
 app.get('/api/projects/:projectId/sessions/:id', (req, res, next) => {
   try { const { sessions } = projects.get(req.params.projectId); res.json(sessions.snapshot(sessions.get(req.params.id))); } catch (e) { next(e); }

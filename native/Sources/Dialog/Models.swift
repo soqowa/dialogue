@@ -331,7 +331,7 @@ struct Preferences: Codable {
         catch { await audio.stop(); capture = nil; message = error.localizedDescription }
         starting = false
     }
-    func stopCapture() async { guard !stopping else { return }; stopping = true; running = false; let audio = capture; capture = nil; await audio?.stop(); remoteLevel = 0; micLevel = 0; activeMicrophoneName = nil; microphoneIssue = nil; stopping = false }
+    func stopCapture() async { guard !stopping else { return }; stopping = true; running = false; startedAt = nil; let audio = capture; capture = nil; await audio?.stop(); remoteLevel = 0; micLevel = 0; activeMicrophoneName = nil; microphoneIssue = nil; stopping = false }
     func refreshMicrophones() {
         microphoneDevices = MicrophoneDevices.available()
         systemMicrophoneName = microphoneDevices.first(where: { $0.id == MicrophoneDevices.defaultID() })?.name ?? "не выбран"
@@ -471,6 +471,15 @@ struct Preferences: Codable {
         } catch { await loadMaterials(); message = error.localizedDescription }
     }
     func deleteMaterial(_ id: String, projectID: String? = nil) async { do { _ = try await BackendProcess.shared.request(projectPath("materials/" + id, id: projectID ?? currentProjectID), method: "DELETE"); await loadMaterials() } catch { message = error.localizedDescription } }
+    /// Removes several materials at once, e.g. every file of an imported folder.
+    func deleteMaterials(_ ids: [String], projectID: String? = nil) async {
+        guard !ids.isEmpty else { return }
+        do {
+            let body = try JSONSerialization.data(withJSONObject: ["ids": ids])
+            _ = try await BackendProcess.shared.request(projectPath("materials/delete", id: projectID ?? currentProjectID), method: "POST", body: body)
+            await loadMaterials()
+        } catch { await loadMaterials(); message = error.localizedDescription }
+    }
     func login() async {
         do { let data = try await BackendProcess.shared.request("/api/login", method: "POST"); if let object = try JSONSerialization.jsonObject(with: data) as? [String: Any], let link = object["url"] as? String, let url = URL(string: link) { NSWorkspace.shared.open(url) } }
         catch { message = error.localizedDescription }

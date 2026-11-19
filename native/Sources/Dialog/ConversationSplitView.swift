@@ -8,10 +8,10 @@ struct ConversationSplitView: View {
     @State private var hovered = false
     @FocusState private var dividerFocused: Bool
 
-    private let dividerWidth: CGFloat = 18
+    private let dividerWidth: CGFloat = 14
     private let minimumAnswerWidth: CGFloat = 380
     private let minimumTranscriptWidth: CGFloat = 260
-    private let tint = Color(red: 0.33, green: 0.44, blue: 0.27)
+    private let tint = Color.white
 
     var body: some View {
         GeometryReader { geometry in
@@ -33,7 +33,7 @@ struct ConversationSplitView: View {
 
     private func divider(width: CGFloat, maximum: CGFloat) -> some View {
         Capsule()
-            .fill(tint.opacity(hovered || dragStartWidth != nil || dividerFocused ? 0.65 : 0.22))
+            .fill(tint.opacity(hovered || dragStartWidth != nil || dividerFocused ? 0.55 : 0.16))
             .frame(width: 3, height: 32)
             .frame(width: dividerWidth)
             .frame(maxHeight: .infinity)
