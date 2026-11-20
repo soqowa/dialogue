@@ -45,6 +45,22 @@ test('Incremental context includes every new utterance rather than the last 24, 
   sessions.addTranscript(session, { id: 'new', source: 'mic', text: 'добавление', time: 81 });
   const next = makePrompt('Ещё вопрос', session, []); assert.equal(JSON.parse(next.text).newTranscript.length, 1);
 }));
+test('The catalog is compact, sent once per thread and resent only after the base changes', async () => fixture(async ({ session }) => {
+  const small = [{ id: 'a', name: 'notes.md', hash: '1' }, { id: 'b', name: 'project/src/queue.ts', hash: '2' }];
+  const first = makePrompt('Вопрос', session, small);
+  assert.deepEqual(JSON.parse(first.text).materialsCatalog, { total: 2, files: ['notes.md', 'project/src/queue.ts'] });
+  assert.ok(!first.text.includes('"hash"'));
+  session.catalogDigest = first.catalogDigest;
+  assert.deepEqual(JSON.parse(makePrompt('Ещё', session, small).text).materialsCatalog, { unchanged: true, total: 2 });
+  assert.equal(JSON.parse(makePrompt('После восстановления', session, small, { replay: true }).text).materialsCatalog.total, 2);
+  const changed = [...small, { id: 'c', name: 'new.md', hash: '3' }];
+  assert.deepEqual(JSON.parse(makePrompt('После импорта', session, changed).text).materialsCatalog.files, ['new.md', 'notes.md', 'project/src/queue.ts']);
+  const large = Array.from({ length: 540 }, (_, i) => ({ id: 'id' + i, hash: 'h' + i, name: `repo/services/service-${i % 12}/src/module/file-${i}.java` }));
+  const summary = JSON.parse(makePrompt('Большая база', session, large).text).materialsCatalog;
+  assert.equal(summary.total, 540); assert.ok(!summary.files); assert.ok(summary.folders.length <= 60);
+  assert.ok(summary.folders.some(f => f.startsWith('repo/services/service-0/')));
+  assert.ok(JSON.stringify(summary).length < 4000);
+}));
 test('Shortcut requests use both speakers and existing assistant context without requiring typed text', async () => fixture(async ({ sessions, session }) => {
   assert.throws(() => conversationRequest(session), /нет распознанных/);
   sessions.addTranscript(session, { id: 'a', source: 'remote', text: 'Чем отличаются интеграционные тесты?', time: 1 });
@@ -53,7 +69,7 @@ test('Shortcut requests use both speakers and existing assistant context without
   const prompt = JSON.parse(makePrompt(request.question, session, [{ id: 'doc', name: 'testing.md' }], { ...request, replay: true }).text);
   assert.equal(prompt.newTranscript.length, 2); assert.equal(prompt.newTranscript[1].speaker, 'Я');
   assert.equal(prompt.liveTranscript.length, 1); assert.equal(prompt.liveTranscript[0].text, 'И что с базой данных?');
-  assert.equal(prompt.liveTranscript[0].provisional, true); assert.equal(prompt.materialsCatalog[0].path, 'testing.md');
+  assert.equal(prompt.liveTranscript[0].provisional, true); assert.deepEqual(prompt.materialsCatalog.files, ['testing.md']);
   session.transcript = [];
   const exchange = sessions.begin(session, 'Первый вопрос', 'test'); exchange.text = 'Предыдущий ответ';
   assert.ok(conversationRequest(session).question.length > 0);

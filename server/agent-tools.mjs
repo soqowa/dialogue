@@ -28,7 +28,8 @@ export class AgentTools {
       case 'list_materials': {
         const offset = integer(args.offset, 0, 1e9), limit = Math.max(1, integer(args.limit, 100, 500));
         const all = this.knowledge.list().filter(d => !args.path || d.name.toLowerCase().includes(String(args.path).toLowerCase()));
-        return { materials: all.slice(offset, offset + limit), total: all.length, nextOffset: offset + limit < all.length ? offset + limit : null };
+        const page = all.slice(offset, offset + limit).map(({ id, name, characters, lines, chunks }) => ({ id, name, characters, lines, chunks }));
+        return { materials: page, total: all.length, nextOffset: offset + limit < all.length ? offset + limit : null };
       }
       case 'search_materials': {
         if (!String(args.query || '').trim()) throw new Error('Укажите поисковый запрос или используйте list_materials/read_material');

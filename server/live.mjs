@@ -76,7 +76,7 @@ export function connectConversation(ws, { projects, codex, speech, getStatus, ca
       await codex.answer({ session: target, cwd: context.work, model: model.model, effort,
         instructions: instructions(answerSettings.style, answerSettings.strict), prompt: prompt.text, signal: controller.signal,
         onThread: () => sessions.save(target),
-        onAccepted: async () => { target.transcriptCursor = Math.max(startCursor, prompt.cursor); await sessions.save(target); },
+        onAccepted: async () => { target.transcriptCursor = Math.max(startCursor, prompt.cursor); target.catalogDigest = prompt.catalogDigest; await sessions.save(target); },
         toolHandler: async (name, args) => { exchange.toolCalls.push({ tool: name, arguments: args }); const result = await tools.call(name, args); await sessions.save(target); return result; },
         onEvent: event => {
           if (event.type === 'answer.delta') {
