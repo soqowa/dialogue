@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="brand/readme-icon.png" width="144" height="144" alt="Dialog app icon">
+  <img src="brand/readme-icon.png" width="144" height="144" alt="Dialogue app icon">
 </p>
 
-<h1 align="center">Dialog</h1>
+<h1 align="center">Dialogue</h1>
 
 <p align="center">
   A native macOS call assistant that hears the conversation and suggests answers from your own materials.
@@ -14,7 +14,7 @@
   &nbsp;·&nbsp; <a href="#build-from-source">Build&nbsp;guide</a>
 </p>
 
-Dialog (Диалог) listens to system audio and your microphone, transcribes speech on your Mac, and drafts a reply grounded in your materials through your **Codex** subscription (sign in with ChatGPT). No API key is needed, and nothing joins the call.
+Dialogue (Диалог) listens to system audio and your microphone, transcribes speech on your Mac, and drafts a reply grounded in your materials through your **Codex** subscription (sign in with ChatGPT). No API key is needed, and nothing joins the call.
 
 ## Features
 
@@ -39,7 +39,7 @@ The build isn’t notarized by Apple. On first launch, open **System Settings �
 ## Quick start
 
 1. **Sign in to Codex.** In **Settings → Codex and audio** (Настройки → Codex и звук), click **Sign in** (Войти) and sign in to ChatGPT with an account that has Codex access.
-2. **Grant permissions.** Allow the microphone and **Screen & System Audio Recording**. Dialog needs it to capture sound and doesn’t record the screen image.
+2. **Grant permissions.** Allow the microphone and **Screen & System Audio Recording**. Dialogue needs it to capture sound and doesn’t record the screen image.
 3. **Add materials.** Create a project, add documents or folders, and set the answer style.
 4. **Start listening.** Click **Listen** (Слушать). Answers appear automatically or when you press the shortcut.
 
@@ -57,7 +57,6 @@ scripts/build-mac.sh                 # → build/Диалог.app
 | Script | What it does |
 | --- | --- |
 | `scripts/install-mac.sh` | Builds and installs `/Applications/Диалог.app` |
-| `scripts/install-nightly.sh` | Installs a separate “Диалог Nightly” copy next to the main app |
 | `scripts/package-mac.py` | Builds a self-contained DMG in `output/` |
 
 For development, open `native/Package.swift` in Xcode and choose the **Dialog → My Mac** scheme.
