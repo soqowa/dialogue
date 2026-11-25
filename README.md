@@ -1,29 +1,51 @@
-# Диалог
+<p align="center">
+  <img src="brand/readme-icon.png" width="144" height="144" alt="Dialog app icon">
+</p>
 
-Нативный помощник для звонков на macOS. Слушает системный звук и микрофон, распознаёт речь прямо на Маке и подсказывает ответ по вашим материалам через подписку **Codex** (вход через ChatGPT). API-ключ не нужен, к звонку никто не подключается.
+<h1 align="center">Dialog</h1>
 
-## Возможности
+<p align="center">
+  A native macOS call assistant that hears the conversation and suggests answers from your own materials.
+</p>
 
-- **Любой звонок.** Захватывает весь системный звук (Zoom, Telegram, браузер и т. д.) и отдельно ваш микрофон. Реплики подписаны «Я» и «Собеседник».
-- **Локальное распознавание.** Parakeet TDT v3 (CoreML / Neural Engine), GigaAM v3, Whisper Large v3 Turbo и Base (MLX). Аудио не уходит в сеть.
-- **Ответы по материалам.** PDF, DOCX, Markdown, TXT, исходники и целые папки. Номера источников в ответе открывают исходный фрагмент.
-- **Автоответ или по клавише.** Глобальный шорткат (по умолчанию ⌃⌥↩) работает из любого приложения.
-- **Проекты.** У каждого свои материалы, манера ответа, модель и история разговоров.
-- **Интерфейс.** Тёмная тема в стиле Liquid Glass на macOS 26+, на macOS 14–15 — матовые материалы.
+<p align="center">
+  <strong><a href="https://github.com/soqowa/dialogue/releases/latest">Download for Mac</a></strong>
+  &nbsp;·&nbsp; <a href="#quick-start">Quick&nbsp;start</a>
+  &nbsp;·&nbsp; <a href="#build-from-source">Build&nbsp;guide</a>
+</p>
 
-## Установка
+Dialog (Диалог) listens to system audio and your microphone, transcribes speech on your Mac, and drafts a reply grounded in your materials through your **Codex** subscription (sign in with ChatGPT). No API key is needed, and nothing joins the call.
 
-1. Скачайте `Dialog-*-Apple-Silicon.dmg` из [Releases](https://github.com/soqowa/dialogue/releases) и перетащите «Диалог» в «Программы».
-2. Сборка не нотариализована Apple. При первом запуске откройте **Системные настройки → Конфиденциальность и безопасность** и нажмите «Всё равно открыть».
-3. В **Настройки → Codex и звук** нажмите «Войти» и войдите в ChatGPT с доступом к Codex.
-4. Разрешите микрофон и **запись экрана и системного аудио**. Это нужно для захвата звука, изображение экрана не записывается.
-5. Добавьте материалы, настройте манеру ответа и нажмите «Слушать».
+## Features
 
-Нужен Mac с Apple Silicon. Node.js, Python, Codex CLI и движки распознавания уже внутри DMG. Модели распознавания скачиваются при первом выборе движка.
+- **Any call.** Captures all system audio (Zoom, Telegram, a browser, and so on) and your microphone separately. Lines are labeled “Me” and “Other side”.
+- **On-device speech recognition.** Parakeet TDT v3 (CoreML / Neural Engine), GigaAM v3, Whisper Large v3 Turbo and Base (MLX). Audio never leaves your Mac.
+- **Answers from your materials.** PDF, DOCX, Markdown, TXT, source code, and whole folders. Citation numbers in an answer open the original passage.
+- **Auto-reply or on demand.** A global shortcut (⌃⌥↩ by default) works from any app.
+- **Projects.** Each project has its own materials, answer style, model, and conversation history.
+- **Interface.** A dark Liquid Glass look on macOS 26 and later, with frosted materials on macOS 14–15. The interface is in Russian.
 
-## Сборка из исходников
+## Installation
 
-Нужны Xcode 26+, Node.js 22+, [`uv`](https://github.com/astral-sh/uv), Python 3.11, `ffmpeg` и Codex CLI с входом через ChatGPT.
+Download `Dialog-*-Apple-Silicon.dmg` from the [latest release](https://github.com/soqowa/dialogue/releases/latest) and drag **Диалог** to Applications. It requires a Mac with **Apple Silicon** and **macOS 14 or later**. Node.js, Python, the Codex CLI, and the speech engines ship inside the DMG. Speech models download the first time you pick an engine.
+
+<details>
+<summary>Open an unnotarized build</summary>
+
+The build isn’t notarized by Apple. On first launch, open **System Settings → Privacy & Security** and click **Open Anyway**.
+
+</details>
+
+## Quick start
+
+1. **Sign in to Codex.** In **Settings → Codex and audio** (Настройки → Codex и звук), click **Sign in** (Войти) and sign in to ChatGPT with an account that has Codex access.
+2. **Grant permissions.** Allow the microphone and **Screen & System Audio Recording**. Dialog needs it to capture sound and doesn’t record the screen image.
+3. **Add materials.** Create a project, add documents or folders, and set the answer style.
+4. **Start listening.** Click **Listen** (Слушать). Answers appear automatically or when you press the shortcut.
+
+## Build from source
+
+You need Xcode 26+, Node.js 22+, [`uv`](https://github.com/astral-sh/uv), Python 3.11, `ffmpeg`, and the Codex CLI signed in with ChatGPT.
 
 ```sh
 npm install
@@ -32,33 +54,16 @@ codex login
 scripts/build-mac.sh                 # → build/Диалог.app
 ```
 
-| Скрипт | Что делает |
+| Script | What it does |
 | --- | --- |
-| `scripts/install-mac.sh` | Собирает и ставит `/Applications/Диалог.app` |
-| `scripts/install-nightly.sh` | Ставит отдельную копию «Диалог Nightly» рядом с основной |
-| `scripts/package-mac.py` | Собирает автономный DMG в `output/` |
+| `scripts/install-mac.sh` | Builds and installs `/Applications/Диалог.app` |
+| `scripts/install-nightly.sh` | Installs a separate “Диалог Nightly” copy next to the main app |
+| `scripts/package-mac.py` | Builds a self-contained DMG in `output/` |
 
-Для разработки откройте `native/Package.swift` в Xcode и выберите схему **Dialog → My Mac**.
+For development, open `native/Package.swift` in Xcode and choose the **Dialog → My Mac** scheme.
 
-## Как устроено
-
-```text
-Системный звук (ScreenCaptureKit) ┐
-                                  ├→ Silero VAD → локальная ASR → диалог «Я» / «Собеседник»
-Микрофон (AVAudioEngine) ─────────┘                                       ↓
-                       материалы + инструменты поиска и чтения → codex app-server → ответ
-```
-
-- `native/` — приложение на SwiftUI: интерфейс, захват звука, шорткаты.
-- `server/` — локальный сервис на Node.js (`127.0.0.1:4317`): импорт материалов, поиск, сессии, связь с Codex.
-- `speech/` — Python-воркер с движками распознавания.
-- `public/` — старый браузерный прототип, оставлен для отладки.
-
-## Данные и приватность
-
-Звук обрабатывается только на Маке. В Codex уходят текст диалога, ваш вопрос, инструкции и найденные фрагменты материалов. Материалы, история и настройки хранятся локально: в `~/Library/Application Support/Dialog` для DMG-версии и в `.local/` при запуске из исходников. Запросы расходуют лимит вашей подписки Codex.
-
-## Тесты
+<details>
+<summary>Run the tests</summary>
 
 ```sh
 npm test
@@ -66,10 +71,32 @@ npm test
 swift test --package-path native
 ```
 
-## Сторонние компоненты
+</details>
 
-Используемые проекты и их лицензии перечислены в [`third-party/README.md`](third-party/README.md).
+The app icon is drawn by [`scripts/make-icon.swift`](scripts/make-icon.swift) during the build.
 
-## Лицензия
+## How it works
 
-[MIT](LICENSE).
+```text
+System audio (ScreenCaptureKit) ┐
+                                ├→ Silero VAD → on-device ASR → “Me” / “Other side” transcript
+Microphone (AVAudioEngine) ─────┘                                          ↓
+                  materials + search and read tools → codex app-server → answer
+```
+
+- `native/` — the SwiftUI app: interface, audio capture, shortcuts.
+- `server/` — a local Node.js service (`127.0.0.1:4317`): material import, search, sessions, and the Codex connection.
+- `speech/` — a Python worker with the speech engines.
+- `public/` — the original browser prototype, kept for debugging.
+
+## Data and privacy
+
+Audio is processed only on your Mac. Codex receives the transcript, your question, your instructions, and the matching passages from your materials. Materials, history, and settings stay local: in `~/Library/Application Support/Dialog` for the DMG build and in `.local/` when running from source. Requests count toward your Codex subscription limits.
+
+## Third-party components
+
+Bundled projects and their licenses are listed in [`third-party/README.md`](third-party/README.md).
+
+## License
+
+[MIT](LICENSE)
